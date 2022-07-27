@@ -1,0 +1,14 @@
+Index: htop-3.5.0/linux/LibSensors.c
+===================================================================
+--- htop-3.5.0.orig/linux/LibSensors.c
++++ htop-3.5.0/linux/LibSensors.c
+@@ -163,6 +163,9 @@ static int tempDriverPriority(const sens
+       /* Snapdragon 410 */
+       { "cpu0_1_thermal",     0 },
+       { "cpu2_3_thermal",     0 },
++      /* Others */
++      { "f10e4078.thermal",   0 }, // Marvell Armada 385
++      { "f10182b0.thermal",   0 }, // Marvell Armada XP
+       /* Low priority drivers */
+       { "acpitz",             1 },
+    };
