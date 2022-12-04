@@ -1,11 +1,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hiawatha
-PKG_VERSION:=11.1
-PKG_RELEASE:=$(AUTORELEASE)
+PKG_VERSION:=11.2
+PKG_RELEASE:=2
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://www.hiawatha-webserver.org/files/
-PKG_HASH:=d21722986f64163e30a560283123cdf4d6cb5ff8188ab754387b26724565268d
+PKG_HASH:=99c64f76927f93469f062ab76b74eb79a397ea4be12da86bf746b2bb57cf1bc5
 
 PKG_MAINTAINER:=Marius Dinu <marius+git@psihoexpert.ro>
 PKG_LICENSE:=GPL-2.0-only
@@ -82,8 +82,8 @@ define Package/hiawatha/config
       This tool is specific to hiawatha.
 endef
 
-# Hiawatha needs mbedtls v3.1.0 with MBEDTLS_THREADING_PTHREAD and MBEDTLS_THREADING_C.
-# mbedtls in OpenWrt is too old to use. Hiawatha install it's own private mbedtls.
+# Hiawatha needs mbedtls v3.x with MBEDTLS_THREADING_PTHREAD and MBEDTLS_THREADING_C.
+# mbedtls in OpenWrt is too old to use. Hiawatha install it's own mbedtls.
 # When OpenWrt will update mbedtls, replace the -DUSE_SYSTEM_MBEDTLS=OFF with the one commented.
 CMAKE_OPTIONS += -DLIBXSLT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/libxslt" \
 	-DENABLE_IPV6=$(if $(CONFIG_IPV6),ON,OFF) \
@@ -112,12 +112,12 @@ define Package/hiawatha/install
 # Remove this section when switching to shared mbedtls
   ifeq ($(CONFIG_HIAWATHA_TLS),y)
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.1.0 $(1)/usr/lib/libmbedcrypto.so.3.1.0
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.11 $(1)/usr/lib/libmbedcrypto.so.11
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.1.0 $(1)/usr/lib/libmbedx509.so.3.1.0
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.1.0 $(1)/usr/lib/libmbedcrypto.so.3.2.1
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.12 $(1)/usr/lib/libmbedcrypto.so.12
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.1.0 $(1)/usr/lib/libmbedx509.so.3.2.1
 	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.4 $(1)/usr/lib/libmbedx509.so.4
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.1.0 $(1)/usr/lib/libmbedtls.so.3.1.0
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.17 $(1)/usr/lib/libmbedtls.so.17
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.1.0 $(1)/usr/lib/libmbedtls.so.3.2.1
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.18 $(1)/usr/lib/libmbedtls.so.18
   endif
 	
 	$(INSTALL_DIR) $(1)/etc/hiawatha
