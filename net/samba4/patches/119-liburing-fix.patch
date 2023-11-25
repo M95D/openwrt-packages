@@ -1,0 +1,11 @@
+--- a/source3/wscript
++++ b/source3/wscript
+@@ -1685,8 +1685,6 @@ int main(void) {
+ 
+     if conf.CHECK_CFG(package='liburing', args='--cflags --libs',
+                       msg='Checking for liburing package', uselib_store="URING"):
+-        if (conf.CHECK_HEADERS('liburing.h', lib='uring')
+-                                      and conf.CHECK_LIB('uring', shlib=True)):
+             conf.CHECK_FUNCS_IN('io_uring_ring_dontfork io_uring_prep_writev2', 'uring',
+                                 headers='liburing.h')
+             # There are a few distributions, which
