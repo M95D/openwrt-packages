@@ -35,7 +35,7 @@ define Package/libdevmapper/Default
   TITLE:=The Linux Kernel Device Mapper userspace library
   URL:=https://sourceware.org/dm/
   VERSION:=$(PKG_VERSION_DM)
-  DEPENDS:=+kmod-dm +libpthread +libuuid +librt +libblkid
+  DEPENDS:=+libpthread +libuuid +librt +libblkid
 endef
 
 
