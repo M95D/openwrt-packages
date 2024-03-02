@@ -1,11 +1,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hiawatha
-PKG_VERSION:=11.2
-PKG_RELEASE:=2
+PKG_VERSION:=11.5
+PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://www.hiawatha-webserver.org/files/
-PKG_HASH:=99c64f76927f93469f062ab76b74eb79a397ea4be12da86bf746b2bb57cf1bc5
+PKG_HASH:=5c921fe5c475c02f9744a7a106fc0d6dcc2369074344664b9558faa55e96961b
 
 PKG_MAINTAINER:=Marius Dinu <marius+git@psihoexpert.ro>
 PKG_LICENSE:=GPL-2.0-only
@@ -88,14 +88,15 @@ endef
 CMAKE_OPTIONS += -DLIBXSLT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/libxslt" \
 	-DENABLE_IPV6=$(if $(CONFIG_IPV6),ON,OFF) \
 	-DENABLE_TLS=$(if $(CONFIG_HIAWATHA_TLS),ON,OFF) \
-	-DUSE_SYSTEM_MBEDTLS=OFF \
 	-DENABLE_RPROXY=$(if $(CONFIG_HIAWATHA_RPROXY),ON,OFF) \
 	-DENABLE_CACHE=$(if $(CONFIG_HIAWATHA_CACHE),ON,OFF) \
 	-DENABLE_XSLT=$(if $(CONFIG_HIAWATHA_XSLT),ON,OFF) \
 	-DENABLE_TOOLKIT=$(if $(CONFIG_HIAWATHA_URLTOOLKIT),ON,OFF) \
 	-DENABLE_MONITOR=$(if $(CONFIG_HIAWATHA_MONITOR),ON,OFF) \
-	-DENABLE_TOMAHAWK=OFF
+	-DENABLE_TOMAHAWK=OFF \
+	-DUSE_SYSTEM_MBEDTLS=OFF \
 #	-DUSE_SYSTEM_MBEDTLS=$(if $(CONFIG_HIAWATHA_TLS),ON,OFF) \
+
 
 define Package/tvheadend/conffiles
 /etc/hiawatha
@@ -108,18 +109,18 @@ define Package/hiawatha/install
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/wigwam $(1)/usr/sbin/wigwam
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/cgi-wrapper $(1)/usr/sbin/cgi-wrapper
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/bin/ssi-cgi $(1)/usr/bin/ssi-cgi
-	
+
 # Remove this section when switching to shared mbedtls
   ifeq ($(CONFIG_HIAWATHA_TLS),y)
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.2.1 $(1)/usr/lib/libmbedcrypto.so.3.2.1
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.12 $(1)/usr/lib/libmbedcrypto.so.12
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.2.1 $(1)/usr/lib/libmbedx509.so.3.2.1
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.4 $(1)/usr/lib/libmbedx509.so.4
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.2.1 $(1)/usr/lib/libmbedtls.so.3.2.1
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.18 $(1)/usr/lib/libmbedtls.so.18
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.5.0 $(1)/usr/lib/libmbedcrypto.so.3.5.0
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.15 $(1)/usr/lib/libmbedcrypto.so.15
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.5.0 $(1)/usr/lib/libmbedx509.so.3.5.0
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.6 $(1)/usr/lib/libmbedx509.so.6
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.5.0 $(1)/usr/lib/libmbedtls.so.3.5.0
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.20 $(1)/usr/lib/libmbedtls.so.20
   endif
-	
+
 	$(INSTALL_DIR) $(1)/etc/hiawatha
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/hiawatha.conf $(1)/etc/hiawatha/hiawatha.conf
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/mimetype.conf $(1)/etc/hiawatha/mimetype.conf
@@ -128,7 +129,7 @@ define Package/hiawatha/install
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/index.xslt $(1)/etc/hiawatha/index.xslt
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/error.xslt $(1)/etc/hiawatha/error.xslt
   endif
-	
+
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/hiawatha.init $(1)/etc/init.d/hiawatha
 endef
