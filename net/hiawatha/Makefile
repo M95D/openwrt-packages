@@ -112,11 +112,11 @@ define Package/hiawatha/install
 # Remove this section when switching to shared mbedtls
   ifeq ($(CONFIG_HIAWATHA_TLS),y)
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.1.0 $(1)/usr/lib/libmbedcrypto.so.3.2.1
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.2.1 $(1)/usr/lib/libmbedcrypto.so.3.2.1
 	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.12 $(1)/usr/lib/libmbedcrypto.so.12
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.1.0 $(1)/usr/lib/libmbedx509.so.3.2.1
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.2.1 $(1)/usr/lib/libmbedx509.so.3.2.1
 	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.4 $(1)/usr/lib/libmbedx509.so.4
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.1.0 $(1)/usr/lib/libmbedtls.so.3.2.1
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.2.1 $(1)/usr/lib/libmbedtls.so.3.2.1
 	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.18 $(1)/usr/lib/libmbedtls.so.18
   endif
 	
