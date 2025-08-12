@@ -21,7 +21,7 @@ define Package/usbtop
   CATEGORY:=Utilities
   TITLE:=USB bandwidth visualization tool
   URL:=https://github.com/aguinet/usbtop
-  DEPENDS:= @USB +libstdcpp +libpcap
+  DEPENDS:= @USB_SUPPORT +libstdcpp +libpcap
 endef
 
 define Package/usbtop/description
