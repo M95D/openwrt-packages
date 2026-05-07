@@ -1,13 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hiawatha
-PKG_VERSION:=11.5
+PKG_VERSION:=11.8
 PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://www.hiawatha-webserver.org/files/
-PKG_HASH:=5c921fe5c475c02f9744a7a106fc0d6dcc2369074344664b9558faa55e96961b
+PKG_SOURCE_URL:=https://hiawatha.leisink.net/files/
+PKG_HASH:=1376763750fb9a88a780bac6aba8707bc2a78f8ee089c62d433e50216a5183bd
 
-PKG_MAINTAINER:=Marius Dinu <marius+git@psihoexpert.ro>
+PKG_MAINTAINER:=Marius Dinu <m95d+git@psihoexpert.ro>
 PKG_LICENSE:=GPL-2.0-only
 PKG_LICENSE_FILES:=LICENSE
 
@@ -40,7 +40,7 @@ define Package/hiawatha/config
     #select PACKAGE_libmbedtls
     default y
     help
-      Support encrypted HTTP connections (TLS v2)
+      Support encrypted HTTP connections (TLS)
       Uses libmbedtls.
   config HIAWATHA_RPROXY
     bool "Reverse proxy"
@@ -98,7 +98,7 @@ CMAKE_OPTIONS += -DLIBXSLT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/libxslt" \
 #	-DUSE_SYSTEM_MBEDTLS=$(if $(CONFIG_HIAWATHA_TLS),ON,OFF) \
 
 
-define Package/tvheadend/conffiles
+define Package/hiawatha/conffiles
 /etc/hiawatha
 endef
 
@@ -113,12 +113,7 @@ define Package/hiawatha/install
 # Remove this section when switching to shared mbedtls
   ifeq ($(CONFIG_HIAWATHA_TLS),y)
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.3.5.0 $(1)/usr/lib/libmbedcrypto.so.3.5.0
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedcrypto.so.15 $(1)/usr/lib/libmbedcrypto.so.15
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.3.5.0 $(1)/usr/lib/libmbedx509.so.3.5.0
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedx509.so.6 $(1)/usr/lib/libmbedx509.so.6
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.3.5.0 $(1)/usr/lib/libmbedtls.so.3.5.0
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbedtls.so.20 $(1)/usr/lib/libmbedtls.so.20
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbed* $(1)/usr/lib/
   endif
 
 	$(INSTALL_DIR) $(1)/etc/hiawatha
