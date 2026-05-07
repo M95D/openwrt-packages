@@ -1,11 +1,11 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=hiawatha
-PKG_VERSION:=11.8
+PKG_VERSION:=12.2
 PKG_RELEASE:=1
 PKG_SOURCE:=$(PKG_NAME)-$(PKG_VERSION).tar.gz
-PKG_SOURCE_URL:=https://hiawatha.leisink.net/files/
-PKG_HASH:=1376763750fb9a88a780bac6aba8707bc2a78f8ee089c62d433e50216a5183bd
+PKG_SOURCE_URL:=https://hiawatha.leisink.net/files/download/
+PKG_HASH:=1251c426b151c46471899bf3de50a5650e4fd852864fdf9f22c512038492f668
 
 PKG_MAINTAINER:=Marius Dinu <m95d+git@psihoexpert.ro>
 PKG_LICENSE:=GPL-2.0-only
@@ -24,7 +24,7 @@ define Package/hiawatha
   TITLE:=web server
   URL:=http://www.hiawatha-webserver.org/
   MENU:=1
-  DEPENDS:= +zlib +HIAWATHA_XSLT:libxml2 +HIAWATHA_XSLT:libxslt $(ICONV_DEPENDS)
+  DEPENDS:=$(ICONV_DEPENDS) +zlib +HIAWATHA_XSLT:libxml2 +HIAWATHA_XSLT:libxslt +HIAWATHA_HTTP2:libnghttp2
   # +HIAWATHA_TLS:libmbedtls
   USERID:=hiawatha:hiawatha
 endef
@@ -38,10 +38,17 @@ define Package/hiawatha/config
     bool "TLS"
     depends on PACKAGE_hiawatha
     #select PACKAGE_libmbedtls
+    #select MBEDTLS_THREADING_C
     default y
     help
       Support encrypted HTTP connections (TLS)
       Uses libmbedtls.
+  config HIAWATHA_HTTP2
+    bool "HTTP/2"
+    depends on HIAWATHA_TLS
+    default y
+    help
+      Support HTTP/2.
   config HIAWATHA_RPROXY
     bool "Reverse proxy"
     depends on PACKAGE_hiawatha
@@ -82,49 +89,49 @@ define Package/hiawatha/config
       This tool is specific to hiawatha.
 endef
 
-# Hiawatha needs mbedtls v3.x with MBEDTLS_THREADING_PTHREAD and MBEDTLS_THREADING_C.
+# Hiawatha needs mbedtls v4.x with MBEDTLS_THREADING_PTHREAD and MBEDTLS_THREADING_C.
 # mbedtls in OpenWrt is too old to use. Hiawatha install it's own mbedtls.
 # When OpenWrt will update mbedtls, replace the -DUSE_SYSTEM_MBEDTLS=OFF with the one commented.
 CMAKE_OPTIONS += -DLIBXSLT_INCLUDE_DIR="$(STAGING_DIR)/usr/include/libxslt" \
 	-DENABLE_IPV6=$(if $(CONFIG_IPV6),ON,OFF) \
 	-DENABLE_TLS=$(if $(CONFIG_HIAWATHA_TLS),ON,OFF) \
+	-DENABLE_HTTP2=$(if $(CONFIG_HIAWATHA_HTTP2),ON,OFF) \
 	-DENABLE_RPROXY=$(if $(CONFIG_HIAWATHA_RPROXY),ON,OFF) \
 	-DENABLE_CACHE=$(if $(CONFIG_HIAWATHA_CACHE),ON,OFF) \
 	-DENABLE_XSLT=$(if $(CONFIG_HIAWATHA_XSLT),ON,OFF) \
 	-DENABLE_TOOLKIT=$(if $(CONFIG_HIAWATHA_URLTOOLKIT),ON,OFF) \
 	-DENABLE_MONITOR=$(if $(CONFIG_HIAWATHA_MONITOR),ON,OFF) \
 	-DENABLE_TOMAHAWK=OFF \
+	-DENABLE_SANDBOX=OFF \
 	-DUSE_SYSTEM_MBEDTLS=OFF \
 #	-DUSE_SYSTEM_MBEDTLS=$(if $(CONFIG_HIAWATHA_TLS),ON,OFF) \
 
-
 define Package/hiawatha/conffiles
-/etc/hiawatha
+  /etc/hiawatha
 endef
 
 define Package/hiawatha/install
-	$(INSTALL_DIR) $(1)/usr/bin
 	$(INSTALL_DIR) $(1)/usr/sbin
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/hiawatha $(1)/usr/sbin/hiawatha
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/wigwam $(1)/usr/sbin/wigwam
 	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/cgi-wrapper $(1)/usr/sbin/cgi-wrapper
-	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/bin/ssi-cgi $(1)/usr/bin/ssi-cgi
+	$(INSTALL_BIN) $(PKG_BUILD_DIR)/ipkg-install/usr/sbin/ssi-cgi $(1)/usr/sbin/ssi-cgi
 
 # Remove this section when switching to shared mbedtls
-  ifeq ($(CONFIG_HIAWATHA_TLS),y)
+ifeq ($(CONFIG_HIAWATHA_TLS),y)
 	$(INSTALL_DIR) $(1)/usr/lib
-	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/libmbed* $(1)/usr/lib/
-  endif
+	$(CP) $(PKG_BUILD_DIR)/ipkg-install/usr/lib/hiawatha/lib* $(1)/usr/lib/
+endif
+# end of mbedtls section
 
 	$(INSTALL_DIR) $(1)/etc/hiawatha
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/hiawatha.conf $(1)/etc/hiawatha/hiawatha.conf
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/mimetype.conf $(1)/etc/hiawatha/mimetype.conf
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/cgi-wrapper.conf $(1)/etc/hiawatha/cgi-wrapper.conf
-  ifeq ($(CONFIG_HIAWATHA_XSLT),y)
+ifeq ($(CONFIG_HIAWATHA_XSLT),y)
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/index.xslt $(1)/etc/hiawatha/index.xslt
 	$(INSTALL_DATA) $(PKG_BUILD_DIR)/ipkg-install/etc/hiawatha/error.xslt $(1)/etc/hiawatha/error.xslt
-  endif
-
+endif
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/hiawatha.init $(1)/etc/init.d/hiawatha
 endef
