@@ -1,0 +1,12 @@
+Index: usbtop-2022.04.19~b9a26bd2/include/usbtop/usb_device.h
+===================================================================
+--- usbtop-2022.04.19~b9a26bd2.orig/include/usbtop/usb_device.h
++++ usbtop-2022.04.19~b9a26bd2/include/usbtop/usb_device.h
+@@ -31,6 +31,7 @@
+ #ifndef USBTOP_USB_DEVICE_H
+ #define USBTOP_USB_DEVICE_H
+ 
++#include <cstdint>
+ #include <iostream>
+ #include <usbtop/usb_stats.h>
+ 
