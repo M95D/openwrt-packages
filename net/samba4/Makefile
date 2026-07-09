@@ -74,7 +74,8 @@ define Package/samba4-libs
 	+libuuid \
 	+zlib \
 	+KERNEL_IO_URING:liburing \
-	+PACKAGE_icu:icu \
+	+icu \
+	+iconv \
 	+PACKAGE_libpam:libpam \
 	+SAMBA4_SERVER_AD_DC:acl \
 	+(SAMBA4_SERVER_AD_DC||SAMBA4_SERVER_VFS):attr \
@@ -208,7 +209,6 @@ CONFIGURE_ARGS += \
 	--without-fam \
 	--without-gettext \
 	--without-gpgme \
-	--without-iconv \
 	--without-kernel-keyring \
 	--without-lttng \
 	--without-pam \
@@ -240,7 +240,6 @@ HOST_CONFIGURE_ARGS += \
 	--without-fam \
 	--without-gettext \
 	--without-gpgme \
-	--without-iconv \
 	--without-json \
 	--without-ldap \
 	--without-ldb-lmdb \
