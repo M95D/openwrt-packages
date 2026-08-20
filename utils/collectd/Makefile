@@ -1,4 +1,4 @@
-#
+
 # Copyright (C) 2006-2016 OpenWrt.org
 #
 # This is free software, licensed under the GNU General Public License v2.
@@ -45,7 +45,6 @@ COLLECTD_PLUGINS_DISABLED:= \
 	cgroups \
 	cpusleep \
 	curl_jolokia \
-	curl_json \
 	curl_xml \
 	dbi \
 	dcpmm \
@@ -146,6 +145,7 @@ COLLECTD_PLUGINS_SELECTED:= \
 	cpufreq \
 	csv \
 	curl \
+	curl_json \
 	df \
 	dhcpleases \
 	disk \
@@ -213,7 +213,7 @@ COLLECTD_PLUGINS_SELECTED:= \
 	write_prometheus
 
 PKG_CONFIG_DEPENDS:= \
-	$(patsubst %,CONFIG_PACKAGE_collectd-mod-%,$(subst _,-,$(COLLECTD_PLUGINS_SELECTED))) \
+	$(patsubst %,CONFIG_PACKAGE_collectd-mod-%,$(COLLECTD_PLUGINS_SELECTED)) \
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/kernel.mk
@@ -263,7 +263,6 @@ CONFIGURE_ARGS+= \
 	--disable-werror \
 	--enable-daemon \
 	--with-nan-emulation \
-	--with-libyajl=no \
 	--without-perl-bindings
 
 CONFIGURE_VARS+= \
@@ -291,7 +290,7 @@ endif
 
 CONFIGURE_PLUGIN= \
 	$(foreach m, $(1), \
-		$(if $(CONFIG_PACKAGE_collectd-mod-$(subst _,-,$(m))),--enable-$(m),--disable-$(m)) \
+		$(if $(CONFIG_PACKAGE_collectd-mod-$(m)),--enable-$(m),--disable-$(m)) \
 	)
 
 CONFIGURE_ARGS+= \
@@ -317,6 +316,13 @@ endif
 ifneq ($(CONFIG_PACKAGE_collectd-mod-mysql),)
   CONFIGURE_ARGS+= --with-libmysql="$(STAGING_DIR)/usr/"
 endif
+
+# curl_json needs libyajl
+#ifneq ($(CONFIG_PACKAGE_collectd-mod-curl_json),)
+#  CONFIGURE_ARGS+= --with-libyajl=y
+#else
+#  CONFIGURE_ARGS+= --with-libyajl=n
+#endif
 
 # exception: mod-netlink needs libnetlink from iproute
 ifneq ($(CONFIG_PACKAGE_collectd-mod-netlink),)
@@ -463,6 +469,7 @@ $(eval $(call BuildPlugin,cpu,CPU input,cpu,))
 $(eval $(call BuildPlugin,cpufreq,CPU Freq input,cpufreq,))
 $(eval $(call BuildPlugin,csv,CSV output,csv,))
 $(eval $(call BuildPlugin,curl,cURL input,curl,+PACKAGE_collectd-mod-curl:libcurl))
+$(eval $(call BuildPlugin,curl_json,cURL-JSON input,curl_json,+PACKAGE_collectd-mod-curl_json:libcurl +PACKAGE_collectd-mod-curl_json:yajl))
 #$(eval $(call BuildPlugin,dbi,relational database input,dbi,+PACKAGE_collectd-mod-dbi:libdbi))
 $(eval $(call BuildPlugin,df,disk space input,df,))
 $(eval $(call BuildPlugin,dhcpleases,show dhcpleases,dhcpleases,))
@@ -482,11 +489,11 @@ $(eval $(call BuildPlugin,iwinfo,libiwinfo wireless statistics,iwinfo,+PACKAGE_c
 $(eval $(call BuildPlugin,load,system load input,load,))
 $(eval $(call BuildPlugin,logfile,log files output,logfile,))
 $(eval $(call BuildPlugin,lua,lua input/output,lua,+PACKAGE_collectd-mod-lua:liblua))
-$(eval $(call BuildPlugin,match-empty-counter,empty-counter match,match_empty_counter,))
-$(eval $(call BuildPlugin,match-hashed,hashed match,match_hashed,))
-$(eval $(call BuildPlugin,match-regex,regex match,match_regex,))
-$(eval $(call BuildPlugin,match-timediff,timediff match,match_timediff,))
-$(eval $(call BuildPlugin,match-value,value match,match_value,))
+$(eval $(call BuildPlugin,match_empty_counter,empty counter match,match_empty_counter,))
+$(eval $(call BuildPlugin,match_hashed,hashed match,match_hashed,))
+$(eval $(call BuildPlugin,match_regex,regex match,match_regex,))
+$(eval $(call BuildPlugin,match_timediff,timediff match,match_timediff,))
+$(eval $(call BuildPlugin,match_value,value match,match_value,))
 $(eval $(call BuildPlugin,mysql,MySQL status input,mysql,+PACKAGE_collectd-mod-mysql:libmysqlclient-r))
 $(eval $(call BuildPlugin,memory,physical memory usage input,memory,))
 $(eval $(call BuildPlugin,modbus,read variables through libmodbus,modbus,+PACKAGE_collectd-mod-modbus:libmodbus))
@@ -513,7 +520,7 @@ $(eval $(call BuildPlugin,statsd,statsd input,statsd,))
 $(eval $(call BuildPlugin,swap,swap input,swap,))
 $(eval $(call BuildPlugin,syslog,syslog output,syslog,))
 $(eval $(call BuildPlugin,tail,tail input,tail,))
-$(eval $(call BuildPlugin,tail-csv,tail CSV input,tail_csv,))
+$(eval $(call BuildPlugin,tail_csv,tail CSV input,tail_csv,))
 $(eval $(call BuildPlugin,table,table-like structured file input,table,))
 $(eval $(call BuildPlugin,teamspeak2,TeamSpeak2 input,teamspeak2,))
 $(eval $(call BuildPlugin,ted,The Energy Detective input,ted,))
@@ -526,9 +533,9 @@ $(eval $(call BuildPlugin,uptime,uptime status input,uptime,))
 $(eval $(call BuildPlugin,users,user logged in status input,users,))
 $(eval $(call BuildPlugin,vmem,virtual memory usage input,vmem,))
 $(eval $(call BuildPlugin,wireless,wireless status input,wireless,))
-$(eval $(call BuildPlugin,write-graphite,Carbon/Graphite output,write_graphite,+PACKAGE_collectd-mod-write-graphite:libpthread))
-$(eval $(call BuildPlugin,write-http,HTTP POST output,write_http,+PACKAGE_collectd-mod-write-http:libcurl))
-$(eval $(call BuildPlugin,write-prometheus,Prometheus output,write_prometheus,+PACKAGE_collectd-mod-write-prometheus:libprotobuf-c +PACKAGE_collectd-mod-write-prometheus:libmicrohttpd))
+$(eval $(call BuildPlugin,write_graphite,Carbon/Graphite output,write_graphite,+PACKAGE_collectd-mod-write-graphite:libpthread))
+$(eval $(call BuildPlugin,write_http,HTTP POST output,write_http,+PACKAGE_collectd-mod-write-http:libcurl))
+$(eval $(call BuildPlugin,write_prometheus,Prometheus output,write_prometheus,+PACKAGE_collectd-mod-write-prometheus:libprotobuf-c +PACKAGE_collectd-mod-write-prometheus:libmicrohttpd))
 
 $(eval $(call BuildScriptPlugin,sqm,SQM/qdisc collection,sqm_collectd,+PACKAGE_collectd-mod-sqm:collectd-mod-exec))
 $(eval $(call BuildScriptLuaPlugin,ltq-dsl,Lantiq DSL collection,dsl,@ltq-dsl-app +PACKAGE_collectd-mod-ltq-dsl:collectd-mod-lua +libubus-lua))
