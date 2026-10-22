@@ -1,13 +1,13 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=tvheadend
-PKG_RELEASE:=3
+PKG_RELEASE:=1
 
 PKG_SOURCE_PROTO:=git
 PKG_SOURCE_URL:=https://github.com/tvheadend/tvheadend
-PKG_MIRROR_HASH:=da2a0c9f49c678e0c6f71c095e16555f3cbaf34d0a7b95b06ade7cfde0f98b9f
-PKG_SOURCE_VERSION:=547f8bfaec9307d3ba59370159df792295593f59
-PKG_SOURCE_DATE:=2026-09-24
+PKG_MIRROR_HASH:=1aa90af7779875a977649587021ed0294bdb479b2b4eb5de8004d01f3c5fbbf6
+PKG_SOURCE_VERSION:=80729d2f6f4b9bd11ceaf8835699c82e6bfed630
+PKG_SOURCE_DATE:=2026-07-23
 
 PKG_LICENSE:=GPL-3.0
 PKG_LICENSE_FILES:=LICENSE.md
@@ -15,7 +15,7 @@ PKG_LICENSE_FILES:=LICENSE.md
 PKG_BUILD_PARALLEL:=1
 PKG_FIXUP:=autoreconf
 PKG_BUILD_FLAGS:=no-mips16
-PKG_BUILD_DEPENDS:=gettext-full/host node/host
+PKG_BUILD_DEPENDS:=gettext-full/host
 
 include $(INCLUDE_DIR)/package.mk
 include $(INCLUDE_DIR)/nls.mk
@@ -38,7 +38,6 @@ define Package/tvheadend
   URL:=https://tvheadend.org
   MAINTAINER:=Marius Dinu <m95d+git@psihoexpert.ro>
   DEPENDS:= \
-	dvb-support \
 	+librt \
 	+libffi \
 	+libopenssl \
@@ -46,7 +45,7 @@ define Package/tvheadend
 	+zlib \
 	+TVHEADEND_AVAHI_SUPPORT:libavahi-client \
 	+TVHEADEND_REGEX_PCRE2:libpcre2 \
-	+TVHEADEND_CSA:libdvbcsa
+	+BUILD_PATENTED&&TVHEADEND_CSA:libdvbcsa
 
 ## Transcoding | Add these to DEPENDS.
 ##	+TVHEADEND_LIBFFMPEG:libffmpeg-full \
@@ -155,6 +154,9 @@ ifeq ($(CONFIG_TVHEADEND_DVB_DDCI),)
 endif
 endif
 
+ifeq ($(CONFIG_BUILD_PATENTED),)
+	CONFIGURE_ARGS += --disable-tvhcsa --disable-dvbcsa --disable-constcw --disable-cwc --disable-capmt --disable-cccam
+else
 ifeq ($(CONFIG_TVHEADEND_CSA),)
 	CONFIGURE_ARGS += --disable-tvhcsa --disable-dvbcsa --disable-constcw --disable-cwc --disable-capmt --disable-cccam
 else
@@ -170,6 +172,7 @@ ifeq ($(CONFIG_TVHEADEND_CAPMT),)
 endif
 ifeq ($(CONFIG_TVHEADEND_CCCAM),)
 	CONFIGURE_ARGS += --disable-cccam
+endif
 endif
 endif
 
@@ -241,7 +244,6 @@ CONFIGURE_ARGS += \
 	--disable-libfdkaac \
 	--disable-libfdkaac_static \
 	--disable-pcloud_cache \
-	--enable-vue_build \
 	--enable-bundle \
 	--disable-uriparser \
 	--disable-execinfo \
