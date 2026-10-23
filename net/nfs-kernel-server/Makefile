@@ -47,7 +47,7 @@ endef
 define Package/nfs-kernel-server
 	$(call Package/nfs-kernel-server/Default)
 	TITLE:=Kernel NFS server (NFSv3)
-	DEPENDS+= +kmod-fs-nfsd +kmod-fs-nfs +rpcbind +libevent2-core +libreadline
+	DEPENDS+= +rpcbind +libevent2-core +libreadline
 	VARIANT:=v3
 	USERID:=nfs:nfs
 	CONFLICTS:=nfs-kernel-server-v4
@@ -60,7 +60,7 @@ endef
 define Package/nfs-kernel-server-v4
 	$(call Package/nfs-kernel-server/Default)
 	TITLE:=Kernel NFS server (NFSv4.x)
-	DEPENDS+= +kmod-fs-nfsd +kmod-fs-nfs +rpcbind +kmod-fs-nfs-v4 +libkeyutils +libdevmapper +libevent2-core +libreadline
+	DEPENDS+= +rpcbind +libkeyutils +libdevmapper +libevent2-core +libreadline
 	VARIANT:=v4
 	PROVIDES:=nfs-kernel-server
 	USERID:=nfs:nfs
